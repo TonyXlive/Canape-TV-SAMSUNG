@@ -2,13 +2,15 @@
 # et la publie dans les « Releases » du dépôt. TizenBrew Installer (option « Install from GitHub »)
 # installe ensuite automatiquement le .wgt de la dernière release.
 #
-# Se lance quand on pousse une étiquette de version (ex. v1.1.0).
-# Le journal de chaque fabrication est rangé dans la branche « journal-build ».
+# Se lance à chaque modification de l'appli sur la branche principale (ou à la main depuis l'onglet Actions).
+# La version publiée est celle de tizen/config.xml. Le journal de chaque fabrication est rangé dans la branche « journal-build ».
 name: Appli Samsung (.wgt)
 
 on:
+  workflow_dispatch:
   push:
-    tags: ['v*']
+    branches: [main]
+    paths: ['app/**', 'service/**', 'tizen/**', '.github/workflows/appli-samsung.yml']
 
 permissions:
   contents: write
@@ -33,9 +35,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          gh release delete "$TAG" -y --cleanup-tag=false 2>/dev/null || true
-          gh release create "$TAG" dist/CanapeTV.wgt \
+          TAG="v$(sed -n 's/.*<widget [^>]*version="\([^"]*\)".*/\1/p' tizen/config.xml)"
+          gh release delete "$TAG" -y --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" dist/CanapeTV.wgt --target "$GITHUB_SHA" --latest \
             --title "Canapé TV ${TAG#v}" \
             --notes "Appli Canapé TV pour TV Samsung. À installer avec TizenBrew Installer → Install from GitHub → TonyXlive/Canape-TV-SAMSUNG."
           echo "Release $TAG publiée" | tee -a build.log
@@ -44,9 +46,9 @@ jobs:
         if: always()
         run: |
           mkdir -p /tmp/journal && cp build.log /tmp/journal/build.log 2>/dev/null || echo "pas de journal" > /tmp/journal/build.log
-          echo "${{ job.status }} ${GITHUB_REF_NAME} $(date -u +%FT%TZ)" > /tmp/journal/statut.txt
+          echo "${{ job.status }} ${GITHUB_SHA} $(date -u +%FT%TZ)" > /tmp/journal/statut.txt
           cd /tmp/journal
           git init -q && git checkout -q -b journal-build
           git -c user.name=build -c user.email=build@localhost add -A
-          git -c user.name=build -c user.email=build@localhost commit -qm "Journal ${GITHUB_REF_NAME}"
+          git -c user.name=build -c user.email=build@localhost commit -qm "Journal ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" journal-build
