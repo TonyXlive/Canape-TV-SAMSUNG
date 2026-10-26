@@ -1,6 +1,6 @@
 {
   "name": "canape-tv",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Lecteur IPTV pour TV Samsung (Tizen) avec une interface façon plateforme de streaming : M3U, Xtream Codes, guide des programmes, favoris, reprise de lecture, barre de commandes, audio et sous-titres.",
   "packageType": "app",
   "appName": "Canapé TV",

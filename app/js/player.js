@@ -6,10 +6,16 @@
   function PlayerScreen(item, context, startPos) {
     var self = this;
     this.el = U.el('div', 'screen player');
-    this.video = document.createElement('video');
+    // Sur la TV : lecteur intégré de Samsung (meilleur son) ; sinon la balise <video> standard
+    this.useAvPlay = !!(global.AvPlay && global.AvPlay.available());
+    this.video = this.useAvPlay ? global.AvPlay.create() : document.createElement('video');
     this.video.setAttribute('playsinline', '');
     this.video.preload = 'auto';
-    this.el.appendChild(this.video);
+    this.el.appendChild(this.video.node || this.video);
+    if (this.useAvPlay) {
+      this.el.classList.add('avplay');
+      document.documentElement.classList.add('avplay-on');
+    }
 
     this.spinner = U.el('div', 'spinner-wrap');
     this.spinner.appendChild(U.el('div', 'spinner'));
@@ -112,7 +118,7 @@
     if (this.tracksOpen) this.closeTracks();
     this.errorBox.style.display = 'none';
     this.loading(true);
-    this.el.className = 'screen player ' + (this.isLive() ? 'is-live' : 'is-vod');
+    this.el.className = 'screen player ' + (this.isLive() ? 'is-live' : 'is-vod') + (this.useAvPlay ? ' avplay' : '');
     this.playUrl(item.url);
     if (this.isLive()) UserData.addRecent(item);
     this.renderOsd();
@@ -861,6 +867,7 @@
     clearTimeout(this.seekTimer);
     var v = this.video;
     try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) { /* rien */ }
+    if (this.useAvPlay) document.documentElement.classList.remove('avplay-on');
   };
 
   var Player = {

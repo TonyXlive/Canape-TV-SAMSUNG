@@ -920,7 +920,7 @@
       }
     }
     item('Guide des programmes', global.Epg.ready ? 'Chargé' : (Library.data && Library.data.epgUrl ? (global.Net.hasService ? 'En cours de chargement' : 'Indisponible sans le service') : 'Aucune adresse'), function () {});
-    item('Version', 'Canapé TV 1.1', function () {});
+    item('Version', 'Canapé TV 1.2', function () {});
 
     this.vlist = new global.VList(items, null, this.list);
     this.vlist.onMove = function () { self.keepIndex = self.vlist.i; };

@@ -337,6 +337,9 @@ input { -webkit-user-select: text; user-select: text; }
 /* ---------------------------------------------------------------- lecteur */
 
 .player { background: #000; }
+/* lecteur intégré Samsung : la vidéo est dessinée sous la page, qui doit être transparente */
+html.avplay-on, html.avplay-on body, html.avplay-on #app, .player.avplay { background: transparent; }
+.player .avplayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 .player video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; }
 .spinner-wrap {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 2;
