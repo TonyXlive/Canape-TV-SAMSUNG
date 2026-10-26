@@ -3,6 +3,8 @@
 # TizenBrew Installer le re-signe avec le compte Samsung sur les TV 2023 et plus récentes).
 # Utilise les outils officiels Samsung (Tizen Studio en ligne de commande). Lancé par GitHub (voir .github/workflows).
 set -e
+exec < /dev/null
+set -x
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 TS=$HOME/tizen-studio
@@ -23,7 +25,7 @@ if [ ! -x "$TS/tools/ide/bin/tizen" ]; then
   tail -3 /tmp/tizen-install.log
 fi
 export PATH="$TS/tools/ide/bin:$TS/tools:$PATH"
-tizen version || true
+timeout 60 tizen version || true
 
 echo "== 2. Certificat d'auteur"
 mkdir -p "$DATA/keystore/author"
@@ -34,19 +36,19 @@ if [ -n "$AUTHOR_P12" ] && [ -n "$AUTHOR_PWD" ]; then
   echo "Certificat fourni par le dépôt (secret TIZEN_AUTHOR_P12)"
 else
   PWD_AUTHOR="canapetv-$(date +%s)"
-  if ! tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Rhone Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv; then
+  if ! timeout 180 tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Rhone Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv; then
     # l'outil des certificats n'est pas toujours inclus : on l'installe
-    "$TS/package-manager/package-manager-cli.bin" install --accept-license certificate-manager cert-add-on 2>&1 | tail -5 || true
-    tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Rhone Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv
+    timeout 300 "$TS/package-manager/package-manager-cli.bin" install --accept-license certificate-manager cert-add-on 2>&1 | tail -5 || true
+    timeout 180 tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Rhone Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv
   fi
   echo "Nouveau certificat créé pour cette fabrication"
 fi
 ls -la "$DATA/keystore/author/"
 
 echo "== 3. Profil de signature"
-tizen security-profiles add -n canape -a "$AUTHOR" -p "$PWD_AUTHOR" || true
+timeout 180 tizen security-profiles add -n canape -a "$AUTHOR" -p "$PWD_AUTHOR" || true
 PROFILES="$DATA/profile/profiles.xml"
-tizen cli-config "profiles.path=$PROFILES" || true
+timeout 120 tizen cli-config "profiles.path=$PROFILES" || true
 # Sans trousseau de mots de passe sur le serveur : on écrit les mots de passe en clair dans le profil
 if [ -f "$PROFILES" ]; then
   python3 - "$PROFILES" "$PWD_AUTHOR" <<'EOF'
@@ -70,7 +72,7 @@ echo "== 4. Paquet"
 rm -rf build dist && mkdir -p build/wgt dist
 cp -r app service build/wgt/
 cp tizen/config.xml tizen/icon.png build/wgt/
-tizen package -t wgt -s canape -o "$ROOT/dist" -- "$ROOT/build/wgt"
+timeout 300 tizen package -t wgt -s canape -o "$ROOT/dist" -- "$ROOT/build/wgt"
 WGT=$(ls dist/*.wgt | head -1)
 mv "$WGT" dist/CanapeTV.wgt
 unzip -l dist/CanapeTV.wgt | grep -E "signature|config.xml|index.html"
