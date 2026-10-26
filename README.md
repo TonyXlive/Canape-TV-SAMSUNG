@@ -13,9 +13,28 @@ quand tu quittes l'appli avec le bouton Accueil, recherche sans se soucier des a
 
 ---
 
-## Mettre à jour depuis la version 1.0
+## Installer Canapé TV comme une vraie appli (recommandé)
 
-1. Sur la page GitHub de ton dépôt `canape-tv`, clique sur **Add file → Upload files**.
+L'appli apparaît alors dans la liste des applis de la TV, sans passer par TizenBrew.
+
+1. Sur la TV : **Applications**, tape **1 2 3 4 5**, **Developer mode** sur **On**, et dans **Host PC IP**
+   l'adresse IP de ton ordinateur. Redémarre la TV (bouton marche/arrêt maintenu jusqu'au logo Samsung).
+2. Sur l'ordinateur, lance **TizenBrew Installer** et connecte-toi à la TV avec son adresse IP.
+3. Choisis **Install from GitHub** et tape : `TonyXlive/Canape-TV-SAMSUNG`
+4. Canapé TV s'installe et apparaît dans la liste des applis de la TV.
+5. Remets ensuite **127.0.0.1** dans **Host PC IP** si tu utilises aussi TizenBrew.
+
+La première fois, ajoute ta playlist : l'appli installée ne partage pas les réglages du module TizenBrew.
+
+**Mises à jour** : à chaque nouvelle version, GitHub fabrique automatiquement le fichier de l'appli (onglet *Releases*).
+Pour l'installer, refais les étapes 2 et 3. Si la TV refuse la mise à jour, désinstalle d'abord Canapé TV
+(appui long sur l'appli → Supprimer), puis réinstalle : il faudra ressaisir ta playlist.
+
+---
+
+## Mettre à jour le module TizenBrew depuis la version 1.0
+
+1. Sur la page GitHub de ton dépôt, clique sur **Add file → Upload files**.
 2. Dézippe `canape-tv-samsung.zip`, ouvre le dossier `canape-tv` et glisse **tout son contenu** dans la page
    (`app`, `service`, `package.json`, `README.md`, `LICENSE`). GitHub remplace les anciens fichiers.
 3. Clique sur **Commit changes**.
