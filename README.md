@@ -1,5 +1,9 @@
 # Canapé TV
 
+**Fire TV Stick 4K Select (Vega OS)** : adaptation en développement et procédure
+de compilation/installation dans [fire-tv/README.md](fire-tv/README.md).
+Ce port n’a pas encore été compilé ni validé sur l’appareil.
+
 Lecteur IPTV pour TV Samsung (2017 et plus récentes), avec une interface façon plateforme de streaming :
 grande bannière, rangées par catégorie, TV en direct, films, séries, favoris et reprise de lecture.
 
