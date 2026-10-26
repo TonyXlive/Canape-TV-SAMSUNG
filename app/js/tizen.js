@@ -37,6 +37,36 @@
     }
   };
 
+  // ------------------------------------------------------------ appli installée (.wgt) ou module TizenBrew ?
+
+  var PACKAGE_ID = 'CanapeTVsm';
+
+  function packageId() {
+    try { return global.tizen.application.getCurrentApplication().appInfo.packageId; } catch (e) { return ''; }
+  }
+
+  // Installée comme vraie appli : on fait ce que TizenBrew faisait pour nous.
+  Platform.standalone = packageId() === PACKAGE_ID;
+
+  if (Platform.standalone) {
+    // 1) touches de la télécommande à recevoir (couleurs, lecture, chaînes, chiffres)
+    var KEYS = ['MediaPlayPause', 'MediaPlay', 'MediaPause', 'MediaStop', 'MediaFastForward', 'MediaRewind',
+      'ChannelUp', 'ChannelDown', 'ColorF0Red', 'ColorF1Green', 'ColorF2Yellow', 'ColorF3Blue', 'Info',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    for (var i = 0; i < KEYS.length; i++) {
+      try { global.tizen.tvinputdevice.registerKey(KEYS[i]); } catch (e) { /* touche absente sur ce modèle */ }
+    }
+    // 2) démarrage du service de l'appli (playlists, guide des programmes)
+    try {
+      global.tizen.application.launchAppControl(
+        new global.tizen.ApplicationControl('http://tizen.org/appcontrol/operation/service'),
+        PACKAGE_ID + '.Service',
+        function () { /* démarré */ },
+        function (e) { if (global.console) global.console.log('[Canapé TV] service : ' + (e && e.message)); }
+      );
+    } catch (e) { /* pas d'API : l'appli passera en mode direct */ }
+  }
+
   global.Luna = Luna;
   global.Platform = Platform;
   global.DevMode = null; // le mode développeur LG n'existe pas sur Samsung

@@ -1,0 +1,52 @@
+# Fabrique l'appli Samsung installable (CanapeTV.wgt), signée avec un certificat Tizen,
+# et la publie dans les « Releases » du dépôt. TizenBrew Installer (option « Install from GitHub »)
+# installe ensuite automatiquement le .wgt de la dernière release.
+#
+# Se lance quand on pousse une étiquette de version (ex. v1.1.0).
+# Le journal de chaque fabrication est rangé dans la branche « journal-build ».
+name: Appli Samsung (.wgt)
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  wgt:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fabrication et signature
+        id: build
+        env:
+          AUTHOR_P12: ${{ secrets.TIZEN_AUTHOR_P12 }}
+          AUTHOR_PWD: ${{ secrets.TIZEN_AUTHOR_PWD }}
+        run: |
+          set -o pipefail
+          bash tizen/build-wgt.sh 2>&1 | tee build.log
+
+      - name: Publication
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          gh release delete "$TAG" -y --cleanup-tag=false 2>/dev/null || true
+          gh release create "$TAG" dist/CanapeTV.wgt \
+            --title "Canapé TV ${TAG#v}" \
+            --notes "Appli Canapé TV pour TV Samsung. À installer avec TizenBrew Installer → Install from GitHub → TonyXlive/Canape-TV-SAMSUNG."
+          echo "Release $TAG publiée" | tee -a build.log
+
+      - name: Journal
+        if: always()
+        run: |
+          mkdir -p /tmp/journal && cp build.log /tmp/journal/build.log 2>/dev/null || echo "pas de journal" > /tmp/journal/build.log
+          echo "${{ job.status }} ${GITHUB_REF_NAME} $(date -u +%FT%TZ)" > /tmp/journal/statut.txt
+          cd /tmp/journal
+          git init -q && git checkout -q -b journal-build
+          git -c user.name=build -c user.email=build@localhost add -A
+          git -c user.name=build -c user.email=build@localhost commit -qm "Journal ${GITHUB_REF_NAME}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" journal-build

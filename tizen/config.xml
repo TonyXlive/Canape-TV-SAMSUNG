@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://github.com/TonyXlive/Canape-TV-SAMSUNG" version="1.1.0" viewmodes="maximized">
+    <tizen:application id="CanapeTVsm.CanapeTV" package="CanapeTVsm" required_version="3.0"/>
+    <name>Canapé TV</name>
+    <author href="https://github.com/TonyXlive/Canape-TV-SAMSUNG">Anthony Parra</author>
+    <description>Lecteur IPTV : M3U, Xtream Codes, guide des programmes, films et séries.</description>
+    <content src="app/index.html"/>
+    <icon src="icon.png"/>
+    <feature name="http://tizen.org/feature/screen.size.all"/>
+    <feature name="http://tizen.org/feature/web.service"/>
+    <access origin="*" subdomains="true"/>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+    <tizen:privilege name="http://tizen.org/privilege/unlimitedstorage"/>
+    <tizen:profile name="tv-samsung"/>
+    <tizen:service id="CanapeTVsm.Service">
+        <tizen:content src="service/tizen-service.js"/>
+        <tizen:name>CanapeTVService</tizen:name>
+        <tizen:description>Récupère les playlists et le guide des programmes</tizen:description>
+    </tizen:service>
+    <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>
