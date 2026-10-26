@@ -219,7 +219,7 @@
       this.epgNow.appendChild(U.el('div', 'osd-epg-empty', 'Pas d\'informations sur le programme'));
       this.bottom.appendChild(this.epgNow);
       this.bottom.appendChild(this.trackButton());
-      this.bottom.appendChild(U.el('div', 'osd-keys', 'OK  Liste des chaînes     ▲▼  Zapper     ROUGE  Ma liste     VERT  Audio et sous-titres     RETOUR  Quitter'));
+      this.bottom.appendChild(U.el('div', 'osd-keys', 'OK  Liste des chaînes     ▲ / CH ▲  Chaîne suivante     ▼ / CH ▼  Chaîne précédente     ROUGE  Ma liste     VERT  Audio et sous-titres     RETOUR  Quitter'));
       this.loadEpg();
     } else {
       var title = it.kind === 'episode'
@@ -256,7 +256,7 @@
       this.vodBar = bar;
       this.buildControls();
       this.bottom.appendChild(U.el('div', 'osd-keys', '◀▶  Choisir un bouton     OK  Valider     ▲  Barre de lecture (◀▶ pour avancer)' +
-        (this.item.kind === 'episode' ? '     CH ▲▼  Épisode précédent / suivant' : '') + '     RETOUR  Quitter'));
+        (this.item.kind === 'episode' ? '     CH ▲  Épisode suivant     CH ▼  Épisode précédent' : '') + '     RETOUR  Quitter'));
     }
   };
 
@@ -624,8 +624,9 @@
       return;
     }
     if (k === 'back' || k === 'stop') return App.pop();
-    if (k === 'up' || k === 'chup') return this.zap(-1);
-    if (k === 'down' || k === 'chdown') return this.zap(1);
+    // comme sur la TV : CH ▲ (ou ▲) = chaîne suivante, CH ▼ (ou ▼) = chaîne précédente
+    if (k === 'up' || k === 'chup') return this.zap(1);
+    if (k === 'down' || k === 'chdown') return this.zap(-1);
     if (k === 'enter' || k === 'left') return this.openList();
     if (k === 'info' || k === 'right') { this.renderOsd(); return this.showOsd(true); }
     if (k === 'red') {
@@ -647,8 +648,9 @@
     if (k === 'play') { if (this.video.paused) this.togglePause(); return; }
     if (k === 'pause') { if (!this.video.paused) this.togglePause(); return; }
     if (k === 'rw' || k === 'ff') { this.ctrlFocus = 'bar'; this.paintControls(); return this.seek(k === 'ff' ? 60 : -60); }
-    if (k === 'chdown') return this.goNext();
-    if (k === 'chup') return this.goPrev();
+    // CH ▲ = épisode suivant, CH ▼ = épisode précédent
+    if (k === 'chup') return this.goNext();
+    if (k === 'chdown') return this.goPrev();
     var osdOn = this.el.className.indexOf('osd-on') !== -1;
     if (!osdOn) {
       // bandeau masqué : OK = pause, ◀▶ = reculer / avancer de 10 s, ▲▼ = afficher les commandes

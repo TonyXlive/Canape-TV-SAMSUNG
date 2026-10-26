@@ -82,9 +82,9 @@ Astuce : dans les réglages de TizenBrew, **AutoLaunch** peut ouvrir Canapé TV 
 
 | Touche | Dans les menus | Pendant une chaîne | Pendant un film ou un épisode |
 |---|---|---|---|
-| Flèches | Se déplacer | ▲▼ zapper, ◀ liste des chaînes | ◀▶ choisir un bouton de la barre, ▲ barre de lecture |
+| Flèches | Se déplacer | ▲ chaîne suivante, ▼ précédente, ◀ liste des chaînes | ◀▶ choisir un bouton de la barre, ▲ barre de lecture |
 | OK | Ouvrir | Liste des chaînes | Valider le bouton choisi (Pause au départ) |
-| CH ▲▼ | Défiler vite | Zapper | Épisode précédent / suivant |
+| CH ▲▼ | Défiler vite | CH ▲ chaîne suivante, CH ▼ précédente | CH ▲ épisode suivant, CH ▼ précédent |
 | Chiffres | — | Aller à la chaîne n° | — |
 | ROUGE | Ajouter / retirer de Ma liste | Ajouter / retirer de Ma liste | — |
 | VERT | — | Audio et sous-titres | Audio et sous-titres |
