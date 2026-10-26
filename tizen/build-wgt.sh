@@ -4,7 +4,7 @@
 # Utilise les outils officiels Samsung (Tizen Studio en ligne de commande). Lancé par GitHub (voir .github/workflows).
 set -e
 exec < /dev/null
-set -x
+
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 TS=$HOME/tizen-studio

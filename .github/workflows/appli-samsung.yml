@@ -42,12 +42,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v$(sed -n 's/.*<widget [^>]*version="\([^"]*\)".*/\1/p' tizen/config.xml)"
-          gh release delete "$TAG" -y --cleanup-tag 2>/dev/null || true
-          gh release create "$TAG" dist/CanapeTV.wgt --target "$GITHUB_SHA" --latest \
-            --title "Canapé TV ${TAG#v}" \
-            --notes "Appli Canapé TV pour TV Samsung. À installer avec TizenBrew Installer → Install from GitHub → TonyXlive/Canape-TV-SAMSUNG."
-          echo "Release $TAG publiée" | tee -a build.log
+          set -o pipefail
+          {
+            TAG="v$(sed -n 's/.*<widget [^>]*version="\([^"]*\)".*/\1/p' tizen/config.xml)"
+            echo "== 5. Publication de $TAG"
+            gh release delete "$TAG" -y --cleanup-tag || true
+            gh release create "$TAG" dist/CanapeTV.wgt --target "$GITHUB_SHA" --latest \
+              --title "Canapé TV ${TAG#v}" \
+              --notes "Appli Canapé TV pour TV Samsung. À installer avec TizenBrew Installer → Install from GitHub → TonyXlive/Canape-TV-SAMSUNG."
+            echo "Release $TAG publiée"
+          } 2>&1 | tee -a build.log
 
       - name: Journal
         if: always()
