@@ -34,10 +34,10 @@ if [ -n "$AUTHOR_P12" ] && [ -n "$AUTHOR_PWD" ]; then
   echo "Certificat fourni par le dépôt (secret TIZEN_AUTHOR_P12)"
 else
   PWD_AUTHOR="canapetv-$(date +%s)"
-  if ! tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Auvergne-Rhone-Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv; then
+  if ! tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Rhone Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv; then
     # l'outil des certificats n'est pas toujours inclus : on l'installe
     "$TS/package-manager/package-manager-cli.bin" install --accept-license certificate-manager cert-add-on 2>&1 | tail -5 || true
-    tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Auvergne-Rhone-Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv
+    tizen certificate -a canapetv -p "$PWD_AUTHOR" -c FR -s "Rhone Alpes" -ct Lyon -o "Canape TV" -n "Anthony Parra" -f canapetv
   fi
   echo "Nouveau certificat créé pour cette fabrication"
 fi
