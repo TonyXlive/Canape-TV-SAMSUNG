@@ -26,9 +26,26 @@ Limites à valider avant de considérer le port terminé :
 
 ## Préparer et compiler sur un ordinateur
 
+### Compiler sur GitHub depuis Windows
+
+Le workflow [Compiler Canape TV pour Fire TV](../.github/workflows/appli-fire-tv.yml)
+installe le SDK Vega 0.24.12112 sur une machine Ubuntu GitHub et utilise Node.js 22.22.1.
+Il se lance lors des modifications de la branche `fire-tv-vega`. La compilation n’utilise
+pas le stockage de la clé USB. Une exécution réussie fournit l’archive
+`Canape-TV-Fire-TV-Select` dans les artefacts de l’onglet Actions, avec le `.vpkg`,
+le manifeste, les instructions et une somme SHA-256. Un échec ne produit aucun paquet.
+
+La compilation distante ne remplace pas l’essai matériel : le mode développeur et
+l’installation sur le Stick restent à effectuer depuis les outils Vega. Le PC Windows
+peut servir à consulter les journaux et télécharger le résultat ; Ubuntu déjà préparé
+sur la clé peut ensuite servir au transfert sur le Stick.
+
+### Compiler localement
+
 Installer les [Vega Developer Tools](https://developer.amazon.com/docs/vega/0.24/install-vega-sdk)
 sur une configuration prise en charge par Amazon (instructions macOS ou Ubuntu).
-Le SDK et son registre npm doivent être configurés. Aucune modification du compte Amazon
+Le SDK et son registre npm doivent être configurés. Utiliser une version récente de Node.js 22
+(au moins 22.18) pour les dépendances RN 0.83 du modèle SDK 0.24. Aucune modification du compte Amazon
 ou du Stick n’est faite par les scripts de ce dépôt.
 
 Depuis la racine du dépôt :

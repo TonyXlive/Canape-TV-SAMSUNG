@@ -1,0 +1,88 @@
+name: Compiler Canape TV pour Fire TV
+
+on:
+  push:
+    branches: [fire-tv-vega]
+    paths:
+      - 'app/**'
+      - 'fire-tv/**'
+      - '.github/workflows/appli-fire-tv.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fire-tv-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NONINTERACTIVE: 'true'
+      SKIP_VVD_INSTALL: 'true'
+      VEGA_SDK_VERSION: '0.24.12112'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.1'
+      - name: Verifier les adaptateurs
+        run: node --test fire-tv/network.test.mjs
+      - name: Installer Vega sur la machine GitHub
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl jq lz4 ca-certificates build-essential cmake ninja-build pkg-config libpython3.10
+          curl -fsSL --retry 3 https://sdk-installer.vega.labcollab.net/get_vvm.sh -o "$RUNNER_TEMP/install-vega.sh"
+          bash "$RUNNER_TEMP/install-vega.sh"
+          source "$HOME/vega/env"
+          vega --version
+      - name: Generer et preparer le projet
+        shell: bash
+        run: |
+          set -euo pipefail
+          source "$HOME/vega/env"
+          vega project generate --template vegaWebview --name CanapeFireTV --packageId tv.canape.firetv --outputDir vega-build
+          node fire-tv/prepare.mjs vega-build
+          cd vega-build
+          vega project update-manifest --os-min 1.2 --os-version 1.2
+          cat package.json
+          if [ -f CMakeLists.txt ]; then cat CMakeLists.txt; fi
+      - name: Installer les dependances et compiler
+        shell: bash
+        run: |
+          set -euo pipefail
+          source "$HOME/vega/env"
+          cd vega-build
+          npm install --no-audit --no-fund
+          if node -e 'process.exit(require("./package.json").scripts?.["build:app"] ? 0 : 1)'; then
+            npm run build:app
+          else
+            npx --no-install react-native build-vega --build-type Release
+          fi
+      - name: Verifier le paquet du Stick
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p fire-tv-output
+          mapfile -t packages < <(find vega-build/build -type f -path '*/armv7-release/*.vpkg')
+          if [ "${#packages[@]}" -ne 1 ]; then
+            echo 'Un unique paquet ARMv7 Release etait attendu.' >&2
+            exit 1
+          fi
+          cp "${packages[0]}" fire-tv-output/Canape-TV-Fire-TV-Select.vpkg
+          cp vega-build/manifest.toml fire-tv-output/manifest.toml
+          cp fire-tv/README.md fire-tv-output/INSTALLATION.md
+          cd fire-tv-output
+          sha256sum Canape-TV-Fire-TV-Select.vpkg > SHA256SUMS.txt
+      - name: Rendre le paquet telechargeable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Canape-TV-Fire-TV-Select
+          path: fire-tv-output/
+          if-no-files-found: error
+          retention-days: 14
